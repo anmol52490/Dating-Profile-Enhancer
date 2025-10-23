@@ -5,7 +5,7 @@ import photo_ui     # Our new UI file for all photo-related pages
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="AI Profile Wingman",
+    page_title="AI Profile Wingmans",
     page_icon="❤️‍🔥",
     layout="centered"
 )
@@ -114,7 +114,7 @@ def render_deliverable_page():
 
 def render_triage_page():
     """Renders the main homepage, which now acts as a router."""
-    st.title("Your AI Profile Wingman ❤️‍🔥")
+    st.title("Your AI Profile Wingmans ❤️‍🔥")
     st.markdown("Choose your mission. We can write your bio and prompts, or audit your photos.")
     
     st.subheader("I need help with my text...")
