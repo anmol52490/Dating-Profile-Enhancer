@@ -1,7 +1,6 @@
 import json
 
-# --- (Keep all existing text-gen variables: QUESTIONS, QUESTION_PLACEHOLDERS, HINGE_PROMPTS, BUMBLE_PROMPTS) ---
-
+# --- 1. USER Q&A (Unchanged) ---
 QUESTIONS = [
     "What are some of your proudest accomplishment(s)?",
     "What is a skill you have competency in or something trivial you do poorly?",
@@ -28,41 +27,190 @@ QUESTION_PLACEHOLDERS = {
     "List some dating turn-OFF's (silly or serious, detailed not vague)": "e.g., 'Being rude to staff', 'Only talking about themselves', 'Not liking dogs'"
 }
 
-HINGE_PROMPTS = [
-    "A boundary of mine is", "A life goal of mine", "A quick rant about", "A random fact I love is", "A shower thought I recently had",
-    "All I ask is that you", "Apparently, my life's soundtrack is", "Best travel story", "Biggest risk I've taken", "Change my mind about",
-    "Dating me is like", "Do you agree or disagree that", "Don't hate me if I", "First round is on me if", "Give me travel tips for",
-    "Green flags I look for", "Guess the song", "How to pronounce my name", "I bet you can't", "I feel most supported when",
-    "I geek out on", "I get myself out of a funk by", "I go crazy for", "I hype myself up by", "I know the best spot in town for",
-    "I recently discovered that", "I want someone who", "I wind down by", "I wish more people knew", "I won't shut up about",
-    "I'll brag about you to my friends if", "I'll fall for you if", "I'll give you the set up, you guess the punchline",
-    "I'll pick the topic if you start the conversation", "I'm convinced that", "I'm looking for", "I'm weirdly attracted to",
-    "If loving this is wrong, I don't want to be right", "Let's debate this topic", "Let's make sure we're on the same page about",
-    "Most spontaneous thing I've done", "My BFF's take on why you should date me", "My Love Language is", "My best Dad Joke",
-    "My best celebrity impression", "My biggest date fail", "My cry-in-the-car song is", "My favorite line from a movie",
-    "My friends ask me for advice about", "My greatest strength", "My happy place", "My last journal entry was about",
-    "My most controversial opinion is", "My most irrational fear", "My self-care routine is", "My simple pleasures",
-    "My therapist would say I", "Never have I ever", "One thing I'll never do again", "Proof I have musical talent",
-    "Saying \"Hi!\" in as many languages I know", "Something that's non-negotiable for me is"
+# --- 2. THE NEW PROMPT DICTIONARY (Categorized) ---
+PROMPT_TYPES = [
+    "Values & Intent",
+    "Passions & Hobbies",
+    "Humor & Quirks",
+    "Opinions & Hot Takes",
+    "Stories & Anecdotes",
+    "Self-Description",
+    "Vibe & Simple Pleasures",
+    "Pop Culture"
 ]
 
-BUMBLE_PROMPTS = [
-    "My real-life superpower...", "When no one is watching, I...", "My personal hell is...", "What makes a relationship great is...",
-    "I am hoping you...", "I guarantee that you...", "The quickest way to my heart...", "I get way too excited about...",
-    "After work, you can find me...", "I am a great +1 because...", "If I were president...", "Two truths and a lie...",
-    "A non-negotiable...", "If you saw the targeted ads I get, you'd think...", "My zombie apocalypse plan is...",
-    "If I could have a superpower, I'd...", "I'm known for...", "If I had three wishes, I'd wish for...",
-    "If I could travel to any time in the past...", "It's meant to be if...", "The world would be a better place with more...",
-    "A pro and con of dating me...", "If you laugh at this we will get along...", "I will never shut up about...",
-    "Never have I ever...", "Old dating traditions are out, my new tradition is...", "Let's break dating stereotypes by...",
-    "I promise I won't judge you if...", "My most useless skill is...", "Swipe right if...", "A fun fact I'm obsessed with...",
-    "I quote too much from...", "seeking...", "We'll get along if...", "A review by a friend:", "As a child, I was really into...",
-    "Something I learned way later than I should have...", "I'm still not over...", "Perfect first date...",
-    "My 3rd grade teacher described me as...", "I'm really nerdy about...", "Favorite quality in a person..."
-]
+HINGE_PROMPTS_BY_TYPE = {
+    "Values & Intent": [
+        "A boundary of mine is", "A life goal of mine", "All I ask is that you", "First round is on me if", "Green flags I look for",
+        "I feel most supported when", "I want someone who", "I'll brag about you to my friends if", "I'll fall for you if", "I'm looking for",
+        "Let's make sure we're on the same page about", "My Love Language is", "Something that's non-negotiable for me is"
+    ],
+    "Passions & Hobbies": [
+        "Give me travel tips for", "I geek out on", "I know the best spot in town for", "I won't shut up about",
+        "If loving this is wrong, I don't want to be right", "My happy place", "Proof I have musical talent"
+    ],
+    "Humor & Quirks": [
+        "A random fact I love is", "Don't hate me if I", "I bet you can't", "I'll give you the set up, you guess the punchline",
+        "I'm weirdly attracted to", "My best Dad Joke", "My best celebrity impression", "My most irrational fear",
+        "Saying \"Hi!\" in as many languages I know"
+    ],
+    "Opinions & Hot Takes": [
+        "A quick rant about", "A shower thought I recently had", "Change my mind about", "Do you agree or disagree that",
+        "I recently discovered that", "I wish more people knew", "I'm convinced that", "Let's debate this topic", "My most controversial opinion is"
+    ],
+    "Stories & Anecdotes": [
+        "Best travel story", "Biggest risk I've taken", "Most spontaneous thing I've done", "My biggest date fail",
+        "Never have I ever", "One thing I'll never do again"
+    ],
+    "Self-Description": [
+        "Dating me is like", "How to pronounce my name", "I'll pick the topic if you start the conversation",
+        "My BFF's take on why you should date me", "My friends ask me for advice about", "My greatest strength", "My therapist would say I"
+    ],
+    "Vibe & Simple Pleasures": [
+        "I get myself out of a funk by", "I go crazy for", "I hype myself up by", "I wind down by",
+        "My last journal entry was about", "My self-care routine is", "My simple pleasures"
+    ],
+    "Pop Culture": [
+        "Apparently, my life's soundtrack is", "Guess the song", "My cry-in-the-car song is", "My favorite line from a movie"
+    ]
+}
 
-# --- NEW PHOTO ANALYZER PROMPT ---
+BUMBLE_PROMPTS_BY_TYPE = {
+    "Values & Intent": [
+        "What makes a relationship great is...", "I am hoping you...", "The quickest way to my heart...", "A non-negotiable...",
+        "It's meant to be if...", "I promise I won't judge you if...", "Swipe right if...", "seeking...", "We'll get along if...",
+        "Perfect first date...", "Favorite quality in a person..."
+    ],
+    "Passions & Hobbies": [
+        "I get way too excited about...", "After work, you can find me...", "I will never shut up about...",
+        "As a child, I was really into...", "I'm really nerdy about..."
+    ],
+    "Humor & Quirks": [
+        "Two truths and a lie...", "My zombie apocalypse plan is...", "If I could have a superpower, I'd...",
+        "If you laugh at this we will get along...", "My most useless skill is...", "A fun fact I'm obsessed with..."
+    ],
+    "Opinions & Hot Takes": [
+        "My personal hell is...", "If I were president...", "If I had three wishes, I'd wish for...",
+        "The world would be a better place with more...", "Old dating traditions are out, my new tradition is...",
+        "Let's break dating stereotypes by..."
+    ],
+    "Stories & Anecdotes": [
+        "If I could travel to any time in the past...", "Never have I ever...",
+        "Something I learned way later than I should have...", "I'm still not over..."
+    ],
+    "Self-Description": [
+        "My real-life superpower...", "I guarantee that you...", "I am a great +1 because...", "I'm known for...",
+        "A pro and con of dating me...", "A review by a friend:", "My 3rd grade teacher described me as..."
+    ],
+    "Vibe & Simple Pleasures": [
+        "When no one is watching, I..."
+    ],
+    "Pop Culture": [
+        "If you saw the targeted ads I get, you'd think...", "I quote too much from..."
+    ]
+}
 
+# --- 3. NEW AGENTIC SYSTEM PROMPTS ---
+
+# This prompt is for "Agent 1" (The Recommender)
+RECOMMENDER_SYSTEM_PROMPT = """
+You are an expert AI dating coach and profile analyst. Your job is to analyze 10 raw, unfiltered user answers and develop a "Holistic Story" about the user.
+You will perform a 3-phase analysis.
+
+**Phase 1.A: Individual Scan**
+Analyze each of the 10 answers. Note its "Strength" (Strong/Weak) and "Type" (e.g., [Humor & Quirks], [Passions & Hobbies], etc.).
+
+**Phase 1.B: Holistic Synthesis (The "Story Finder")**
+This is the most important step. Look at all 10 answers *together*.
+Find the *connections*. Does "Hobbies: Hiking" connect with "Turn-ons: Being active"?
+Your goal is to synthesize these connections into a 1-2 sentence "Holistic Story" or "User Vibe."
+(e.g., "This user is a 'Curious Adventurer' who loves the outdoors but also has a nerdy, playful side.")
+(e.g., "This user is a 'Thoughtful Homebody' who values deep conversation and simple pleasures.")
+
+**Phase 1.C: Prompt Matching & Rationale**
+Using the "Holistic Story" from 1.B, scan the provided Hinge and Bumble prompt dictionaries.
+Select the **Top 5 Hinge** and **Top 5 Bumble** prompts that are the *best fit* to tell this user's "story."
+For *each* of the 10 recommendations, you MUST provide a 1-sentence `rationale` that explains *why* you chose it and *how* it connects to their answers. (e.g., "Rationale: Perfect for your funny answer about Nickelback.").
+
+**Your Task:**
+Return a single JSON object. Do not use markdown.
+Your output MUST follow this schema:
+{
+  "holistic_story": "Your 1-2 sentence synthesis of the user's vibe.",
+  "recommendations": [
+    {
+      "app": "Hinge",
+      "prompt": "The Hinge prompt you selected",
+      "rationale": "Your 1-sentence reason why this prompt is a good fit."
+    },
+    // ... (9 more recommendations) ...
+  ]
+}
+"""
+
+# This prompt is for "Agent 2" (The Bio Writer)
+BIO_WRITER_SYSTEM_PROMPT = """
+You are an expert dating ghostwriter. You are "light, playful, and witty".
+You will be given the user's "Holistic Story" for context and all 10 of their answers for material.
+
+**YOUR PHILOSOPHY: "Hook, Don't Summarize."**
+Your job is to write a 1-2 sentence "logline" for the user, not a paragraph that lists their hobbies.
+It must be short, confident, and make someone smile.
+
+**YOUR ABSOLUTE RULES:**
+1.  **MAXIMUM 2 SENTENCES.**
+2.  **NEVER "LIST" HOBBIES.** (e.g., DO NOT write "I like hiking, dogs, and tacos.")
+3.  **SHOW, DON'T TELL.** (e.g., INSTEAD of "I'm funny," write "Searching for someone who will laugh at my terrible dad jokes.")
+4.  **USE THE "HOLISTIC STORY" FOR *TONE* ONLY.** If the vibe is "Adventurer," write a hook that sounds adventurous.
+
+**Your Task:**
+Write one (1) short, witty bio (under 500 characters) that acts as a "hook."
+
+**Your Output:**
+Return a single JSON object. Do not use markdown.
+{
+  "bio": "Your generated 1-2 sentence hook here..."
+}
+"""
+
+# This prompt is for "Agent 2" (The Prompt Writer)
+PROMPT_WRITER_SYSTEM_PROMPT = """
+You are an expert dating ghostwriter. You are "light, playful, and witty".
+
+**YOUR PHILOSOPHY: "Intrigue, don't explain."**
+Your goal is to write a *conversation hook*, not a biography. The answer must be short and make someone ask "what?".
+Look at the user's answers in the screenshots - they are TOO LONG and explain EVERYTHING. You must do the opposite.
+
+**YOUR ABSOLUTE RULES:**
+1.  **BREVITY IS EVERYTHING.** Answers must be 1-2 sentences. **NEVER** write a long paragraph.
+2.  **ONE IDEA PER PROMPT.** Find *one* shiny detail from the user's 10 answers and tease it.
+3.  **NEVER "EXPLAIN" OR "SYNTHESIZE."** Do not combine 3-4 facts (e.g., DO NOT mention the dog, the plants, and the spreadsheet all at once).
+
+**HOW TO USE YOUR DATA (This is critical):**
+You will be given a **`specific_rationale`**. This is your *PRIMARY INSTRUCTION*.
+(e.g., "This is perfect for your funny answer about Nickelback.")
+
+* If you get this `rationale`, your job is to use *only* the "Nickelback" answer to write the prompt.
+* The `holistic_story` is just for *tone*.
+* The `10 answers` are for finding the *specific detail* the `rationale` mentioned.
+
+**Your Task:**
+Generate **three (3)** unique, witty, and *very short* answer options for the single prompt provided, following all rules.
+
+**Your Output:**
+Return a single JSON object.
+{
+  "answer_options": [
+    "Your first, very short, witty hook.",
+    "Your second, completely different, short hook.",
+    "Your third, creative and short hook."
+  ]
+}
+"""
+
+
+# --- 4. PHOTO UI PROMPT (Unchanged) ---
+# (Keep the existing PHOTO_ANALYZER_SYSTEM_PROMPT exactly as it was)
 PHOTO_ANALYZER_SYSTEM_PROMPT = """
 You are an expert dating coach and "witty wingman." You will analyze one (1) photo for a man's dating profile. Your critique MUST be based *only* on the rules below. You will be given an image and its intended `photo_slot_number` (1-6).
 
@@ -118,60 +266,5 @@ Analyze the user's uploaded image based on its intended `photo_slot_number`.
 }
 """
 
-SYSTEM_PROMPT = """
-You are an expert dating ghostwriter. You are "light, playful, and witty". Your goal is to write unique, engaging, and charming dating profile content that sparks interest and makes the user sound like their best self.
-
-You will be given a JSON object with 10 answers from a user about their personality. You will also be given a list of Hinge prompts and a list of Bumble prompts.
-
-You must perform the following 3 tasks:
-
-1.  **Write a Bio:**
-    * Write one (1) short, witty bio.
-    * This bio MUST be under 500 characters, as per Tinder/Bumble rules.
-    * It must synthesize 2-3 of the most interesting points from the user's answers.
-    * The tone must be "light, playful, and witty".
-
-2.  **Generate Hinge Prompts:**
-    * Review the *entire* list of Hinge prompts provided.
-    * Select the **three (3)** prompts from that list that you can write the *best* answers for, based on the user's 10 answers.
-    * Write a unique, witty answer for each of the 3 prompts you selected.
-
-3.  **Generate Bumble Prompts:**
-    * Review the *entire* list of Bumble prompts provided.
-    * Select the **two (2)** prompts from that list that you can write the *best* answers for, based on the user's 10 answers.
-    * Write a unique, witty answer for each of the 2 prompts you selected.
-
-**Output Format:**
-You MUST respond *only* with a valid JSON object. Do not write any other text.
-The JSON structure must be:
-{
-  "bio": "Your generated bio text here...",
-  "prompts": [
-    {
-      "app": "Hinge",
-      "question": "The Hinge prompt you selected",
-      "answer": "Your witty answer here"
-    },
-    {
-      "app": "Hinge",
-      "question": "Another Hinge prompt",
-      "answer": "Your witty answer here"
-    },
-    {
-      "app": "Hinge",
-      "question": "Third Hinge prompt",
-      "answer": "Your witty answer here"
-    },
-    {
-      "app": "Bumble",
-      "question": "The Bumble prompt you selected",
-      "answer": "Your witty answer here"
-    },
-    {
-      "app": "Bumble",
-      "question": "Another Bumble prompt",
-      "answer": "Your witty answer here"
-    }
-  ]
-}
-"""
+# --- 5. OLD SYSTEM_PROMPT (Removed) ---
+# The old, simple SYSTEM_PROMPT is no longer needed.
