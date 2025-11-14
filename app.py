@@ -109,27 +109,23 @@ def render_recommendations_page():
     
     with st.form("prompt_selection_form"):
         st.subheader("Hinge Recommendations")
-        for rec in hinge_recs:
+        # Use enumerate for stable keys, as the consultant suggested
+        for i, rec in enumerate(hinge_recs):
             with st.container(border=True):
-                is_selected = st.checkbox(rec['prompt'], key=rec['prompt'])
+                is_selected = st.checkbox(rec['prompt'], key=f"hinge_{i}")
                 st.caption(f"**Reason:** {rec['rationale']}")
                 if is_selected:
-                    # Append a dictionary with BOTH prompt and rationale
-                    selected_prompts_list.append({
-                        "prompt": rec['prompt'],
-                        "rationale": rec['rationale']
-                    }) # <-- NEW
+                    # Append the ENTIRE recommendation object
+                    selected_prompts_list.append(rec) # <-- NEW
         
         st.subheader("Bumble Recommendations")
-        for rec in bumble_recs:
+        for i, rec in enumerate(bumble_recs):
             with st.container(border=True):
-                is_selected = st.checkbox(rec['prompt'], key=rec['prompt'])
+                is_selected = st.checkbox(rec['prompt'], key=f"bumble_{i}")
                 st.caption(f"**Reason:** {rec['rationale']}")
                 if is_selected:
-                    selected_prompts_list.append({
-                        "prompt": rec['prompt'],
-                        "rationale": rec['rationale']
-                    })
+                    # Append the ENTIRE recommendation object
+                    selected_prompts_list.append(rec) # <-- NEW
         
         st.markdown("---")
         submitted = st.form_submit_button("Write My Answers!", use_container_width=True, type="primary")

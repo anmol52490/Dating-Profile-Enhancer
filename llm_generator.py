@@ -102,30 +102,32 @@ def _run_bio_writer_agent(state: ProfileGenerationState):
 def _run_prompt_writer_agent(state: ProfileGenerationState):
     """
     Node 2b: The Prompt Writer.
-    Loops through the user's selected prompts (and their rationales)
+    Loops through the user's selected prompts (and their rationales + anchors)
     and generates 3 options for each.
     """
     print("--- Running Prompt Writer Agent ---")
     client = openai.OpenAI(api_key=state["api_key"])
     generated_prompts_list = []
     
-    # Iterate over the list of dictionaries (e.g., {"prompt": "...", "rationale": "..."})
+    # Iterate over the list of full recommendation dictionaries
     for prompt_data in state["user_selected_prompts"]:
-        prompt_text = prompt_data['prompt']
-        prompt_rationale = prompt_data['rationale']
+        prompt_text = prompt_data.get('prompt', 'Error: No prompt text')
+        
+        # This is the critical fix: Get the 'anchor_text' from the prompt_data
+        anchor_text = prompt_data.get('anchor_text', 'Error: No anchor_text found') # <-- NEW
         
         print(f"  Generating answers for: {prompt_text}")
         
-        # We now pass the RATIONALE from Agent 1 directly into the prompt for Agent 2.
-        # This is the crucial "pipe" that gives the AI specific instructions.
+        # We now pass the ANCHOR_TEXT from Agent 1 directly into the prompt for Agent 2.
+        # Your prompts.py (PROMPT_WRITER_SYSTEM_PROMPT) is already waiting for this.
         user_prompt_content = f"""
         Here is the "Holistic Story" for the user (use this for TONE only):
         "{state['holistic_story']}"
         
-        Here is the *specific rationale* you MUST follow for this prompt (this is your PRIMARY instruction):
-        "{prompt_rationale}"
+        Here is the *exact user quote* (anchor_text) you MUST build your answer around:
+        "{anchor_text}"
         
-        Here are the user's 10 raw answers (use these to find the *one* detail the rationale mentioned):
+        Here are the user's 10 raw answers (for context, but the anchor_text is your focus):
         {json.dumps(state["user_10_answers"], indent=2)}
         
         And here is the specific prompt I need you to write for:
@@ -133,7 +135,7 @@ def _run_prompt_writer_agent(state: ProfileGenerationState):
         """
         
         completion = client.chat.completions.create(
-            model="gpt-4.1-2025-04-14", # You can use "gpt-4o" for higher quality, but "mini" is faster/cheaper
+            model="gpt-4.1-2025-04-14", # Using your specified model
             response_format={"type": "json_object"},
             messages=[
                 {"role": "system", "content": prompts.PROMPT_WRITER_SYSTEM_PROMPT},
