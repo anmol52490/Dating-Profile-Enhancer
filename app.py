@@ -74,7 +74,7 @@ def render_personality_core_page():
 def render_generating_recommendations_page():
     """Page 1.5: Run Agent 1 (Recommender)."""
     st.title("Crafting your profile...")
-    with st.spinner("Analyzing your personality to find your 'vibe' and best prompts..."):
+    with st.spinner("Coming up with something great! May take several minutes..."):
         # This is the call to Agent 1
         recommender_state = llm_generator.run_recommender_graph(st.session_state.user_answers, API_KEY)
         
@@ -194,8 +194,20 @@ def render_deliverable_page():
                 )
             else:
                 st.write("No options generated for this prompt.")
+
+    st.markdown("---")
+    st.success("Want to see even better prompts?")
+    st.markdown(
+        """
+        **My list of best selling Dating Prompts is only $27.**
+        
+        You'll get 25 pages of witty prompts you can use for any dating app.
+        
+        [**Click here to grab the list**](https://jamie-date.mykajabi.com/offers/XDy2mFmT/checkout)
+        """
+    )
     
-    st.success(
+    st.info(
         """
         **Pro-Tip: Reset Your Algorithm!**
         For the best results, delete your *entire* dating account and restart it fresh.
