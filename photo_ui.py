@@ -207,7 +207,7 @@ def render_photo_guide_page():
             * **Prop:** Use a prop like holding a drink or fixing your sleeve (indicating slight movement).
             """
         )
-        
+        st.image("4.png", caption="Social Setting.")
     # --- Page 4: The Action Plan ---
     elif page == 4:
         st.subheader("Page 4: Your DIY Action Plan")
@@ -227,6 +227,7 @@ def render_photo_guide_page():
             When you're done, bring them back to our **"AI Photo Analyzer"** and we'll help you pick the 6 winners.
             """
         )
+        st.image("2.png", caption="Inside v/s Outside")
 
     # --- Navigation (Keep existing) ---
     st.markdown("---")
