@@ -125,7 +125,7 @@ def render_photo_analyzer_page():
     photos_analyzed_count = len(st.session_state.photo_summaries)
     
     if photos_analyzed_count < 6:
-        st.caption(f"Analyze all photos to unlock the full profile review. (Current: {photos_analyzed_count}/3)")
+        st.caption(f"Analyze all photos to unlock the full profile review. (Current: {photos_analyzed_count}/6)")
         st.button("Audit My Profile Flow", disabled=True)
     else:
         st.write("Ready to check your profile flow? We'll look for variety and storytelling.")
