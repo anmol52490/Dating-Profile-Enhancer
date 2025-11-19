@@ -271,7 +271,7 @@ def analyze_photo(api_key, image_bytes, photo_slot_number):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Please analyze this photo. It is for photo_slot_number: {photo_slot_number}. Use your full knowledge base."
+                        "text": f"Please analyze this photo. It is for photo_slot_number: {photo_slot_number}.Does it fit if not where does it fit?  Use your full knowledge base."
                     },
                     {
                         "type": "image_url",
@@ -300,6 +300,31 @@ def analyze_photo(api_key, image_bytes, photo_slot_number):
         print(f"Error calling OpenAI API for image: {e}")
         return None
 # --- NEW FUNCTION FOR PHOTO ANALYSIS ---
+
+def audit_profile_flow(photo_summaries_dict, api_key):
+    """
+    Sends text descriptions of all photos to the LLM for a holistic review.
+    """
+    try:
+        client = openai.OpenAI(api_key=api_key)
+        
+        user_content = f"""
+        Here are the descriptions of the photos I have selected:
+        {json.dumps(photo_summaries_dict, indent=2)}
+        
+        Please audit the flow and variety of my profile.
+        """
+        
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini", # Fast and cheap for text
+            messages=[
+                {"role": "system", "content": prompts.HOLISTIC_PHOTO_REVIEW_PROMPT},
+                {"role": "user", "content": user_content}
+            ]
+        )
+        return completion.choices[0].message.content
+    except Exception as e:
+        return f"Error auditing profile: {e}"
 
 def analyze_photo(api_key, image_bytes, photo_slot_number):
     """

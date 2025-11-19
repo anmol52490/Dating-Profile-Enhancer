@@ -38,46 +38,106 @@ def render_critique_card(critique):
 
 # --- 1. THE PHOTO ANALYZER PAGE (Path A) ---
 def render_photo_analyzer_page():
-    """Renders the 6-slot photo uploader and analysis UI."""
-    st.title("The AI Photo Analyzer")
+    st.title("The AI Photo Smart-Sorter")
     st.button("Back to Home", on_click=set_state, args=["triage"])
     st.markdown("---")
-    st.info("Upload your photos in the *exact order* you plan to use them. The critique changes depending on the slot!")
+    st.info("Upload your photos. We'll tell you if they're good and **where** they belong.")
 
-    # Use tabs for a clean 6-slot UI
-    tab_list = st.tabs([f"Photo {i}" for i in range(1, 7)])
+    # --- 1. Initialize Session State for Summaries ---
+    # We use this to store the text descriptions for the final audit
+    if "photo_summaries" not in st.session_state:
+        st.session_state.photo_summaries = {}
+
+    # --- 2. Render Tabs ---
+    tab_list = st.tabs([f"Slot {i}" for i in range(1, 7)])
     
     for i, tab in enumerate(tab_list, 1):
         with tab:
-            st.subheader(f"Upload Your *Intended* Photo #{i}")
+            st.subheader(f"Candidate for Slot {i}")
             
-            # Define keys for this tab
+            # Unique keys for widgets
             uploader_key = f"uploader_{i}"
-            button_key = f"button_{i}"
-            critique_key = f"critique_{i}"
+            btn_key = f"analyze_btn_{i}"
+            result_key = f"photo_result_{i}"
             
-            uploaded_file = st.file_uploader(f"Slot {i}", type=["jpg", "jpeg", "png"], key=uploader_key)
+            uploaded_file = st.file_uploader("Choose a photo", type=["jpg", "jpeg", "png"], key=uploader_key)
             
             if uploaded_file:
-                st.image(uploaded_file, caption=f"Your uploaded photo for slot {i}")
+                st.image(uploaded_file, caption=f"uploaded image", width=300)
                 
-                if st.button(f"Analyze Photo {i}", key=button_key, use_container_width=True, type="primary"):
-                    with st.spinner(f"Your wingman is analyzing Photo {i}..."):
+                if st.button(f"Analyze Photo {i}", key=btn_key, type="primary"):
+                    with st.spinner("Sorting and analyzing..."):
                         try:
-                            image_bytes = uploaded_file.getvalue()
                             api_key = st.secrets["OPENAI_API_KEY"]
-                            critique_json = llm_generator.analyze_photo(api_key, image_bytes, i)
-                            st.session_state[critique_key] = critique_json
+                            image_bytes = uploaded_file.getvalue()
+                            
+                            # Call LLM
+                            result = llm_generator.analyze_photo(api_key, image_bytes, i)
+                            
+                            # Store result in session state
+                            st.session_state[result_key] = result
+                            
+                            # Store the visual description for the holistic review
+                            if result and "visual_description" in result:
+                                st.session_state.photo_summaries[i] = result["visual_description"]
+                                
                         except Exception as e:
-                            st.error(f"Failed to analyze: {e}")
-                            st.session_state[critique_key] = None
-                
-                # Render the critique card if it exists in the session state
-                if st.session_state[critique_key]:
-                    st.markdown("---")
-                    st.subheader(f"Analysis for Photo {i}")
-                    render_critique_card(st.session_state[critique_key])
+                            st.error(f"Error: {e}")
 
+                # --- Display Results ---
+                if result_key in st.session_state and st.session_state[result_key]:
+                    data = st.session_state[result_key]
+                    
+                    # Top Row: Category & Quality
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        st.metric("Detected Category", data.get("photo_category", "Unknown"))
+                    with c2:
+                        # Color-code quality
+                        q_score = data.get("quality_critique", {}).get("score", "Medium")
+                        st.metric("Quality Score", q_score)
+
+                    # "Best Slot" Logic
+                    best_slots = data.get("best_suited_for_slots", [])
+                    if i in best_slots:
+                        st.success(f"✅ Perfect! This photo belongs in Slot {i}.")
+                    else:
+                        st.warning(f"⚠️ Good photo, but maybe better for Slot {best_slots}?")
+
+                    # Description & Critique
+                    st.write(f"**AI Sees:** *{data.get('visual_description')}*")
+                    st.info(f"**Critique:** {data.get('quality_critique', {}).get('reason')}")
+
+                    # Flags (Clean UI)
+                    red_flags = data.get("red_flags", [])
+                    green_flags = data.get("green_flags", [])
+                    
+                    if red_flags:
+                        st.error(f"**Fix These:** {', '.join(red_flags)}")
+                    if green_flags:
+                        st.success(f"**Winning Traits:** {', '.join(green_flags)}")
+
+    # --- 3. The Holistic Review Section ---
+    st.markdown("---")
+    st.subheader("🔍 Full Profile Audit")
+    
+    # Check if we have enough data (e.g., 3+ photos analyzed)
+    photos_analyzed_count = len(st.session_state.photo_summaries)
+    
+    if photos_analyzed_count < 3:
+        st.caption(f"Analyze at least 3 photos to unlock the full profile review. (Current: {photos_analyzed_count}/3)")
+        st.button("Audit My Profile Flow", disabled=True)
+    else:
+        st.write("Ready to check your profile flow? We'll look for variety and storytelling.")
+        if st.button("Audit My Profile Flow", type="primary"):
+            with st.spinner("Reading your profile story..."):
+                api_key = st.secrets["OPENAI_API_KEY"]
+                # Send the text summaries to the LLM
+                audit_text = llm_generator.audit_profile_flow(st.session_state.photo_summaries, api_key)
+                
+                st.success("Audit Complete!")
+                with st.container(border=True):
+                    st.markdown(audit_text)
 # --- 2. THE DIY PHOTO GUIDE PAGE (Path B) ---
 def render_photo_guide_page():
     """Renders the 'Digital Magazine' style guide."""
