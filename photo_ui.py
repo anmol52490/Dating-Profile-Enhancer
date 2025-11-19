@@ -139,8 +139,10 @@ def render_photo_analyzer_page():
                 with st.container(border=True):
                     st.markdown(audit_text)
 # --- 2. THE DIY PHOTO GUIDE PAGE (Path B) ---
+# In photo_ui.py
+
 def render_photo_guide_page():
-    """Renders the 'Digital Magazine' style guide."""
+    """Renders the 'Digital Magazine' style guide based on PDF notes."""
     st.title("The DIY Photoshoot Guide")
     st.button("Back to Home", on_click=set_state, args=["triage"])
     st.markdown("---")
@@ -150,105 +152,92 @@ def render_photo_guide_page():
 
     page = st.session_state.guide_page
 
-    # --- Page Content ---
+    # --- Page 1: Philosophy ---
     if page == 1:
         st.subheader("Page 1: The Philosophy")
+        st.info("Your photos should be divided into 2 categories: 1. Headshots and 2. Lifestyle.")
         st.markdown(
             """
-            Welcome to the guide. Your notes are clear on what women are *actually* looking for when they swipe:
-            
-            1.  **"What does he look like?"** (This is about CLARITY)
-            2.  **"How will my life fit into his?"** (This is about LIFESTYLE)
-            
-            Your profile's job is to answer both. Your first 3 photos answer question #1. Your last 3 photos answer question #2.
+            **1. Notes on Headshots:**
+            * Your first 1-2 photos should be a headshot.
+            * Headshots should make up the majority of your photos (at least 3).
+            * **Rule:** Viewer should be able to see your face clearly with good lighting.
+            * **Framing:** Cropped chest-high at the bottom and slightly above your head at the top.
+            * **Expression:** Looking at the camera or slightly off. Smiling with teeth!
+
+            **2. Notes on Lifestyle:**
+            * Photos where you are demonstrating competency in a certain area or "awe factor" (showcasing a cute dog etc.) work best.
+            * **Group Photos:** It's okay to have group photos, but only 1-2. They must be listed towards the back, and the viewer must clearly identify who you are.
+            * **Goal:** Showcasing hobbies, passions, and people you like to have fun with.
             """
         )
-        st.image("https://placehold.co/600x300/E2E8F0/4A5568?text=Image+of+clear+headshot+vs+lifestyle+shot", caption="Clarity first, lifestyle second.")
+        # Keep your existing image placeholder or update if you have the specific drive images
+        st.image("1.png", caption="Structure your profile correctly.")
 
+    # --- Page 2: How to Take Better Photos ---
     elif page == 2:
-        st.subheader("Page 2: Mastering 'The Date Photos' (Photos 1-3)")
+        st.subheader("Page 2: How to Take Better Dating Profile Photos")
         st.markdown(
             """
-            Your first 3 photos are your most important. The goal is to answer "What does he look like?" clearly and attractively.
-            
-            #### The "1st Photo Commandments" (DO NOT BREAK)
-            * ❌ **NO Sunglasses.** They want to see your eyes.
-            * ❌ **NO Group Pics.** They don't want to play "Where's Waldo?"
-            * ❌ **NO Selfies.** (Especially mirror, gym, or car selfies).
-            * ❌ **NO Old Pics.** If it's 4+ years old, it's a lie.
-            * ❌ **NO Face Shielding.** (Hats, ski masks, pets in front of your face).
-            
-            #### What TO Do
-            * ✅ **Smile *with teeth***. A "half-smirk" is low energy.
-            * ✅ **Look off-camera** (like you're talking to someone at "10 or 2 o'clock").
-            * ✅ **Wear a 1st date outfit.** A suit, blazer, or stylish layers work perfectly.
-            * ✅ **Get a "paparazzi" style shot.** Have a friend take it, make it look natural.
+            **What TO DO:**
+            * ✅ **Smile with teeth!** A "half-smirk" is low energy. (Pro-tip: Do a round of Crest White Strips to make them pop).
+            * ✅ **Eye Contact:** Look to the camera or look off-camera (like you're talking to someone at "10 or 2 o'clock").
+            * ✅ **Style:** Look nice! A suit, blazer, or stylish layers work perfectly.
+            * ✅ **The Vibe:** Get a "paparazzi" style shot. Have a friend take it, make it look natural.
             """
         )
-        st.image("https://placehold.co/600x300/E2E8F0/4A5568?text=Image+of+a+man+in+a+suit+smiling", caption="A perfect 'Photo 1' is clear, stylish, and has no sunglasses.")
+        st.image("3.png", caption="Smile your way to heart.")
 
+    # --- Page 3: The Gear & Timing ---
     elif page == 3:
-        st.subheader("Page 3: Mastering 'The Lifestyle Photos' (Photos 4-6)")
+        st.subheader("Page 3: The Gear & Timing")
         st.markdown(
             """
-            Now you've shown what you look like, it's time to show *who you are*.
-            
-            #### The "Awe Factor" (Use *one* of these)
-            * **The Pet Pic:** One pic with your dog or cat is great. *Do not* make it a boring selfie. Make it an *activity* (e.g., hiking with your dog).
-            * **The Family Pic:** A photo with your mom or grandma shows your "heart of gold."
-            
-            #### The "Hobby / Activity" Shot
-            * This is where you show "intriguing lifestyle." Are you on a stage? Hiking? Playing guitar?
-            * **The *Only* Time a Shirtless Pic is OK:** If it's an *activity* (beach volleyball, swimming, surfing). A "try-hard" gym or mirror selfie is an automatic RED FLAG.
-            
-            #### The "Social" Shot
-            * You can have *one* group pic here (in slots 4-6).
-            * **Rules:** The group must be small (< 5 people) and it MUST be obvious which one is you.
+            **1. The Gear**
+            * **Light:** A ring light with a clicker is great. Or, your "free ring light": a big window. Face the window when you take the shot.
+            * **Lens:** **CLEAN YOUR LENS.** A smudged lens is the #1 killer of good photos.
+
+            **2. The Timing (Outdoors)**
+            * 🌟 **Best:** "Golden Hour" (7-10 AM or 2-3 PM).
+            * ❌ **Worst:** High Noon (12 PM). It creates harsh shadows under your eyes. Overcast/cloudy days are also great.
+
+            **3. The Posing**
+            * Don't be a "mugshot." Tell your friend (or use a tripod) to **"go for movement."**
+            * Look on or slightly off-camera, laugh, lean on something.
+            * **Prop:** Use a prop like holding a drink or fixing your sleeve (indicating slight movement).
             """
         )
-        st.image("https://placehold.co/600x300/E2E8F0/4A5568?text=Image+of+man+hiking+with+a+dog", caption="An 'activity' or 'awe factor' shot shows personality.")
         
+    # --- Page 4: The Action Plan ---
     elif page == 4:
         st.subheader("Page 4: Your DIY Action Plan")
         st.markdown(
             """
-            Ready to shoot? Here's your game plan.
+            **The Plan:**
+            1.  Get 3-6 outfits. (Layers, suits, casual, active).
+            2.  Go to 3+ locations. (A park, a cool coffee shop, a nice balcony).
+            3.  Take 100+ photos. (Yes, 100. "Done is better than perfect").
+            4.  Edit them. Use a free app like VSCO, Lightleap, or Adobe Lightroom to make the colors "pop."
             
-            #### 1. The Gear
-            * **Light:** A ring light is great. Or, your "free ring light": a big window. **Face the window** when you take the shot.
-            * **Lens:** **CLEAN YOUR LENS.** A smudged lens is the #1 killer of good photos.
-            
-            #### 2. The Timing (Outdoors)
-            * **Best:** "Golden Hour" (7-10 AM or 2-3 PM).
-            * **Worst:** High Noon (12 PM). It creates harsh shadows under your eyes. Overcast/cloudy days are also great.
-            
-            #### 3. The Posing
-            * Don't be a "mugshot." Tell your friend (or use a tripod) to "go for movement."
-            * Look off-camera, laugh, lean on something, hold a drink.
-            
-            #### 4. The Plan
-            1.  **Get 3-6 outfits.** (Layers, suits, casual, active).
-            2.  **Go to 3+ locations.** (A park, a cool coffee shop, a nice balcony).
-            3.  **Take 100+ photos.** (Yes, 100. "Done is better than perfect").
-            4.  **Edit them.** Use a free app like VSCO, Lightleap, or Adobe Lightroom to make the colors "pop."
-            
+            **Technique:**
+            * **If using a friend:** Show them good example photos first so they understand the vibe. Best for lifestyle shots.
+            * **If using a ring light:** Stand facing natural light. Use multiple outfits and angles so it looks like different days. Best for sharp headshots.
+
+            **Next Step:**
             When you're done, bring them back to our **"AI Photo Analyzer"** and we'll help you pick the 6 winners.
             """
         )
 
-    # --- Navigation ---
+    # --- Navigation (Keep existing) ---
     st.markdown("---")
     col1, col2, col3 = st.columns([1, 2, 1])
-
     with col1:
         if page > 1:
             if st.button("< Previous"):
                 st.session_state.guide_page -= 1
                 st.rerun()
-    
     with col2:
         st.write(f"Page {page} of 4")
-
     with col3:
         if page < 4:
             if st.button("Next >"):
