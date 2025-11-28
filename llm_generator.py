@@ -38,11 +38,12 @@ def _run_recommender_agent(state: ProfileGenerationState):
     """
     Node 1: The Recommender Agent.
     Runs Phase 1.A, 1.B, and 1.C to generate recommendations.
+    Includes a validation step to remove hallucinated prompts.
     """
     print("--- Running Recommender Agent ---")
     client = openai.OpenAI(api_key=state["api_key"])
     
-    # We must provide the AI with the prompt dictionaries to choose from
+    # 1. Prepare the input for the AI
     user_prompt_content = f"""
     Here are my 10 answers:
     {json.dumps(state["user_10_answers"], indent=2)}
@@ -54,8 +55,9 @@ def _run_recommender_agent(state: ProfileGenerationState):
     {json.dumps(prompts.BUMBLE_PROMPTS_BY_TYPE, indent=2)}
     """
     
+    # 2. Call the AI
     completion = client.chat.completions.create(
-        model="gpt-4.1-2025-04-14",  # Use a smart model for this complex analysis
+        model="gpt-4o",  # Use a smart model for this complex analysis
         response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": prompts.RECOMMENDER_SYSTEM_PROMPT},
@@ -63,9 +65,33 @@ def _run_recommender_agent(state: ProfileGenerationState):
         ]
     )
     
+    # 3. Get the Raw Response
     response_data = json.loads(completion.choices[0].message.content)
     
-    # Update the shared state
+    # --- VALIDATION LOGIC STARTS HERE (Must be AFTER the API call) ---
+    
+    # 4. Build the set of valid prompts from your prompts.py file
+    valid_hinge = {p for cat in prompts.HINGE_PROMPTS_BY_TYPE.values() for p in cat}
+    valid_bumble = {p for cat in prompts.BUMBLE_PROMPTS_BY_TYPE.values() for p in cat}
+    all_valid_prompts = valid_hinge.union(valid_bumble)
+
+    # 5. Filter the AI's recommendations
+    validated_recs = []
+    original_recs = response_data.get("recommendations", [])
+    
+    for rec in original_recs:
+        # Check if the AI's prompt exists in our official list
+        if rec['prompt'] in all_valid_prompts:
+            validated_recs.append(rec)
+        else:
+            print(f"⚠️ DROPPED HALLUCINATION: AI invented '{rec['prompt']}'")
+
+    # 6. Update the response data with only valid prompts
+    response_data["recommendations"] = validated_recs
+    
+    # --- VALIDATION LOGIC ENDS HERE ---
+    
+    # 7. Update the shared state
     return {
         "holistic_story": response_data.get("holistic_story"),
         "recommendations": response_data.get("recommendations")

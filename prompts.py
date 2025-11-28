@@ -8,13 +8,13 @@ QUESTIONS = [
     "What do you love? What do you hate?",
     "What are some small personal pleasures you love?",
     "Do you have a lifestyle choice you wish to highlight?",
-    "List your Hobbies, Passions, and/or how you like to spend your free time?",
     "What is a silly unpopular opinion you hold?",
     "List some dating turn-ON's (silly or serious, detailed not vague)",
     "List some dating turn-OFF's (silly or serious, detailed not vague)"
 ]
 
 QUESTION_PLACEHOLDERS = {
+    "Do you have a lifestyle choice you wish to highlight?": "e.g., Vegetarian, sober, travel a lot for work, volunteer, middle child...",
     "What are some of your proudest accomplishment(s)?": "e.g., Ran a marathon, built a PC from scratch, kept a plant alive for a whole year...",
     "What is a skill you have competency in or something trivial you do poorly?": "e.g., 'Good at playing guitar' or 'Terrible at tying ties/cooking'",
     "Do you have kids or nieces/nephews you are close with? Pets?": "e.g., 'My golden retriever, Max, is my whole world.' or 'Proud uncle to a 5-year-old nephew.'",

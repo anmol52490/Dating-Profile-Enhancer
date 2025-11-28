@@ -2,6 +2,8 @@ import streamlit as st
 import llm_generator  # Our AI "brain"
 import prompts      # Our static data
 import photo_ui     # Our UI file for all photo-related pages
+import coach_ui     # Our UI file for the Conversation Coach page
+
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -61,7 +63,7 @@ def render_personality_core_page():
             placeholder = prompts.QUESTION_PLACEHOLDERS.get(q, "")
             user_answers[q] = st.text_area(q, placeholder=placeholder, height=100)
         
-        submitted = st.form_submit_button("Analyze My Personality", use_container_width=True, type="primary")
+        submitted = st.form_submit_button("Write my Bios & Prompts", use_container_width=True, type="primary")
 
         if submitted:
             if any(value.strip() == "" for value in user_answers.values()):
@@ -72,19 +74,45 @@ def render_personality_core_page():
                 st.rerun()
 
 def render_generating_recommendations_page():
-    """Page 1.5: Run Agent 1 (Recommender)."""
+    """Page 1.5: Run Agent 1 AND Agent 2 back-to-back (Automated Flow)."""
     st.title("Crafting your profile...")
+    
     with st.spinner("Coming up with something great! May take several minutes..."):
-        # This is the call to Agent 1
-        recommender_state = llm_generator.run_recommender_graph(st.session_state.user_answers, API_KEY)
-        
-        if recommender_state:
-            st.session_state.recommender_state = recommender_state
-            set_state("show_recommendations")
-        else:
-            st.error("There was an error analyzing your profile. Please try again.")
-            set_state("prompt_generator")
-        st.rerun()
+        try:
+            # 1. Run Agent 1 (Recommender)
+            recommender_state = llm_generator.run_recommender_graph(st.session_state.user_answers, API_KEY)
+            
+            if recommender_state and recommender_state.get('recommendations'):
+                # 2. AUTO-SELECT ALL RECOMMENDATIONS (Skip User Selection)
+                # We take the full list from Agent 1 and define it as the "selected" list
+                st.session_state.user_selected_prompts = recommender_state['recommendations']
+                
+                # Save intermediate state just in case
+                st.session_state.recommender_state = recommender_state
+                
+                # 3. Run Agent 2 (Writer) IMMEDIATELY
+                final_state = llm_generator.run_writer_graph(
+                    recommender_state,
+                    st.session_state.user_selected_prompts
+                )
+                
+                if final_state:
+                    st.session_state.final_generated_content = final_state
+                    set_state("deliverable") # Jump straight to results
+                    st.rerun()
+                else:
+                    st.error("There was an error generating your answers.")
+                    if st.button("Try Again"):
+                        set_state("prompt_generator")
+            else:
+                st.error("There was an error analyzing your profile.")
+                if st.button("Try Again"):
+                    set_state("prompt_generator")
+                    
+        except Exception as e:
+            st.error(f"Something went wrong: {e}")
+            if st.button("Back to Start"):
+                set_state("prompt_generator")
 
 def render_recommendations_page():
     """Page 2: The 'Human-in-the-Loop' UI."""
@@ -215,6 +243,16 @@ def render_deliverable_page():
     )
 
 
+    st.markdown("---")
+    st.subheader("What's Next?")
+    st.write("Now that your profile is set, do you want pointers on **opening conversations**?")
+    
+    # This button triggers the switch
+    if st.button("Yes, help me with openers", type="primary"):
+        set_state("coach_mode") # This connects to the router above
+        st.rerun()
+
+
 # --- MAIN APP ROUTER (Modified for new flow) ---
 
 def render_triage_page():
@@ -223,7 +261,7 @@ def render_triage_page():
     st.markdown("Choose your mission. We can write your bio and prompts, or audit your photos.")
     
     st.subheader("I need help with my text...")
-    st.button("Write My Bio & Prompts", on_click=set_state, args=["prompt_generator"], use_container_width=True, type="primary")
+    st.button("Fix my Online Dating Profile", on_click=set_state, args=["prompt_generator"], use_container_width=True, type="primary")
     
     st.markdown("---")
     
@@ -258,3 +296,7 @@ elif st.session_state.app_state == "photo_analyzer":
     photo_ui.render_photo_analyzer_page()
 elif st.session_state.app_state == "photo_guide":
     photo_ui.render_photo_guide_page()
+
+
+elif st.session_state.app_state == "coach_mode":
+    coach_ui.render_coach_page()

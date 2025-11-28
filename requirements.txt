@@ -2,3 +2,4 @@ streamlit
 openai
 pillow
 langgraph
+pinecone-client
